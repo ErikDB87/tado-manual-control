@@ -1,5 +1,5 @@
 # tado-manual-control
-Using tado's API to easily make heating schedules, setting TVR's to `MANUAL` or back to `SCHEDULE`
+Using tado's API to easily make heating schedules, to set TVR's to `MANUAL` or to set them back to `SCHEDULE`
 
 ## Goal
 It annoyed me that the only way to change tado schedules, is to add/edit every block manually in the mobile or web app. I wanted something more manageable.
