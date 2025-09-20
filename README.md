@@ -24,7 +24,7 @@ There's also the possibility to check whether schedule type all zones are in (`O
 You can also set all zones to the same schedule type. I didn't provide a per-zone solution, but it's easy to implement it yourself, of course.
 
 ### Set the temperature for a specific zone
-Because the openHAB tado binding became unusable due to tado's API call limit, I added the function to set the temperature for a specific zone. **Note that libtado
+Because the openHAB tado binding became unusable due to tado's API call limit, I added the function to set the temperature for a specific zone.
 
 ### Reactivate schedule mode for a specific zone
 Logically, I also added a way to reactivate the schedule for a specific zone.
@@ -41,6 +41,8 @@ The script doesn't require much personalization, except for three variables (whi
 * token_file_path = 'refresh_token.json'   # The path of the json file where the Tado refresh token is stored.
 * sheets_dir = "schedule-sheets"           # The directory in which you want to store the sheets.
 ```
+
+If you're using the script in openHAB (https://community.openhab.org/t/very-partial-tado-binding-alternative/166355), make sure to use the **absolute** path for `token_file_path` (e.g. `'/var/lib/openhab/bin/python/tado-manual-control/refresh_token.json'`). Otherwise the script might not find it.
 
 ## API calls
 I started working on this before tado came up with its idiotic idea to limit API calls to 100 per day. But I was almost done, so I finished it anyway. The script makes API calls:
