@@ -59,3 +59,6 @@ Guided by an article I found online (https://samharrison.science/posts/tado-heat
 * libtado (https://libtado.readthedocs.io/en/latest/) - This is the library I ended up using, although I did need to fix something (see above).
 
 I'm sure both libraries have value, and both deserve being honored.
+
+## Possible enhancements
+I haven't done a lot of alpha testing, so any suggestions are welcome!
