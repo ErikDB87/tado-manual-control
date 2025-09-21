@@ -42,7 +42,7 @@ def argparse_args():
     parse_set_schedule_type = subparsers.add_parser(
         "set_schedule_type", help="Sets the active schedule type (0, 1 or 2)")
     parse_set_schedule_type.add_argument(
-        "schedule_type", nargs=1, type=int, choices=[0, 1, 2])
+        "-s", "--schedule_type", nargs=1, type=int, choices=[0, 1, 2])
 
     # manualtemp:
     parse_manualtemp = subparsers.add_parser(
@@ -214,7 +214,7 @@ if __name__ == "__main__":
         text = "Setting schedule type " + \
             str(schedule_type)+" for all your zones..."
         print(text)
-        set_schedule_types(args.set_schedule_type[0])
+        set_schedule_types(args.schedule_type[0])
     elif args.subcommands == "manualtemp":
         zone = args.zone[0]
         temp = args.temperature[0]
