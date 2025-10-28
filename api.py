@@ -60,7 +60,8 @@ class DeviceActivationStatus(StrEnum):
 class Tado:
     json_content = {'Content-Type': 'application/json'}
     access_headers = None
-    api = 'https://my.tado.com/api/v2'
+    #api = 'https://my.tado.com/api/v2'             ## This was the original URL
+    api = 'http://192.168.1.10:52069/api/v2/'       ## This works, thanks to https://github.com/s1adem4n/tado-api-proxy
     api_acme = 'https://acme.tado.com/v1'
     api_minder = 'https://minder.tado.com/v1'
     api_energy_insights = 'https://energy-insights.tado.com/api'

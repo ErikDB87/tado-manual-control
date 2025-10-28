@@ -34,6 +34,8 @@ Obviously, the file `requirements.txt` contains requirements.
 
 Furthermore, a fix of the `libtado` library was necessary. If my PR (https://github.com/germainlefebvre4/libtado/pull/514) has not yet been merged, or the issue is not solved another way, you need to replace `/libtado/api.py` by https://github.com/ErikDB87/libtado/blob/set_schedule_block_by_day_type_fix/libtado/api.py. This file is also included in this repository.
 
+Even without this fix, I altered `/libtado/api.py` to take advantage of this workaround for tado's API limit: https://github.com/s1adem4n/tado-api-proxy. Look at lines 63 and 64.
+
 ## Settings
 The script doesn't require much personalization, except for three variables (which are already set to a default):
 ```
@@ -59,6 +61,8 @@ Guided by an article I found online (https://samharrison.science/posts/tado-heat
 * libtado (https://libtado.readthedocs.io/en/latest/) - This is the library I ended up using, although I did need to fix something (see above).
 
 I'm sure both libraries have value, and both deserve being honored.
+
+Also s1adem4n deserves credit for his workaround around tado's API limit: https://github.com/s1adem4n/tado-api-proxy.
 
 ## Possible enhancements
 I haven't done a lot of alpha testing, so any suggestions are welcome!
