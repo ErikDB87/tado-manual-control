@@ -1,4 +1,7 @@
 import argparse
+# import datetime
+from datetime import time
+from datetime import datetime
 from libtado.api import Tado
 import os
 from pyexcel_ods3 import save_data
@@ -40,7 +43,7 @@ def argparse_args():
 
     # set_schedule_type:
     parse_set_schedule_type = subparsers.add_parser(
-        "set_schedule_type", help="Sets the active schedule type (0, 1 or 2)")
+        "set_schedule_type", help="Sets the active schedule type (0 (= ONE_DAY), 1 (= THREE_DAY) or 2 (=SEVEN_DAY))")
     parse_set_schedule_type.add_argument(
         "-s", "--schedule_type", nargs=1, type=int, choices=[0, 1, 2])
 
@@ -121,30 +124,62 @@ def _output_to_sheets(zone_id, zone_name, outputforsheets):
     save_data(filepath, data)
 
 
+def _check_temperature(temp_to_check, column, sheet, file):
+    if (not isinstance(temp_to_check, int)) and (not isinstance(temp_to_check, float)):
+        error_message = 'The temperature "' + str(temp_to_check) + '" in column ' + str(column) + ' of sheet ' + \
+            str(sheet) + 'in file ' + str(file) + ' isn\'t valid. Make sure to enter a number, using the proper decimal separator.'
+        raise ValueError(error_message)
+    else:
+        return temp_to_check
+
+
+def _check_times(time_to_check, column, sheet, file):
+    if isinstance(time_to_check, time):
+        time_to_check = time_to_check.strftime("%H:%M")
+    elif isinstance(time_to_check, str):
+        try:
+            format = "%H:%M"
+            bool(datetime.strptime(time_to_check, format))
+        except ValueError:
+            format = "%H:%M:%S"
+            if datetime.strptime(time_to_check, format):
+                time_to_check = time_to_check[:-3]
+            else:
+                error_message = 'The time "' + str(time_to_check) + '" in column ' + str(column) + ' of sheet ' + str(sheet) + 'in file ' + str(
+                    file) + ' isn\'t valid. Make sure to enter a time, or a string formatted "%H:%M" (see https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes).'
+                raise ValueError(error_message)
+    else:
+        error_message = 'The time "' + str(time_to_check) + '" in column ' + str(column) + ' of sheet ' + str(sheet) + 'in file ' + str(
+            file) + ' isn\'t valid. Make sure to enter a time, or a string formatted "%H:%M" (see https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes).'
+        raise ValueError(error_message)
+    return time_to_check
+
+
 def upload_schedule_blocks_from_ods():
     all_files = os.listdir(sheets_dir)
     for filename in all_files:
-        zone_int = int(filename.split(" - ")[0])
-        filepath = os.path.join(sheets_dir, filename)
-        sheets_from_ods_file = get_data(filepath)
-        schedule_blocks_to_set = [
-            [],
-            [],
-            []
-        ]
-        for key, value in sheets_from_ods_file.items():
-            schedule = int(key[0])
-            dayType = key[-(len(key)-2):]
-            for entry in value:
-                start = entry[0]
-                end = entry[1]
-                temperature = entry[2]
-                new_schedule_block = _new_schedule_block(
-                    dayType, start, end, temperature)
-                schedule_blocks_to_set[schedule].append(new_schedule_block)
+        if filename.endswith(".ods"):
+            zone_int = int(filename.split(" - ")[0])
+            filepath = os.path.join(sheets_dir, filename)
+            sheets_from_ods_file = get_data(filepath)
+            schedule_blocks_to_set = [
+                [],
+                [],
+                []
+            ]
+            for key, value in sheets_from_ods_file.items():
+                schedule = int(key[0])
+                dayType = key[-(len(key)-2):]
+                for entry in value:
+                    start = _check_times(entry[0], "A", key, filename)
+                    end = _check_times(entry[1], "B", key, filename)
+                    temperature = _check_temperature(entry[2], "C", key, filename)
+                    new_schedule_block = _new_schedule_block(
+                        dayType, start, end, temperature)
+                    schedule_blocks_to_set[schedule].append(new_schedule_block)
 
-        for schedule_int, schedule_block in enumerate(schedule_blocks_to_set):
-            t.set_schedule_blocks(zone_int, schedule_int, schedule_block)
+            for schedule_int, schedule_block in enumerate(schedule_blocks_to_set):
+                t.set_schedule_blocks(zone_int, schedule_int, schedule_block)
 
 
 def _new_schedule_block(dayType, start, end, temperature):

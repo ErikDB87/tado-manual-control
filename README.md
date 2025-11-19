@@ -34,7 +34,11 @@ Obviously, the file `requirements.txt` contains requirements.
 
 Furthermore, a fix of the `libtado` library was necessary. If my PR (https://github.com/germainlefebvre4/libtado/pull/514) has not yet been merged, or the issue is not solved another way, you need to replace `/libtado/api.py` by https://github.com/ErikDB87/libtado/blob/set_schedule_block_by_day_type_fix/libtado/api.py. This file is also included in this repository.
 
-Even without this fix, I altered `/libtado/api.py` to take advantage of this workaround for tado's API limit: https://github.com/s1adem4n/tado-api-proxy. Look at lines 63 and 64.
+I altered `/libtado/api.py` to take advantage of a workaround for tado's API limit ( https://github.com/s1adem4n/tado-api-proxy). I amended line 125, and added a line 126:
+```
+# api = 'https://my.tado.com/api/v2'             ## This was the original URL
+api = 'http://192.168.1.10:52069/api/v2'         ## This works, thanks to https://github.com/s1adem4n/tado-api-proxy
+```
 
 ## Settings
 The script doesn't require much personalization, except for three variables (which are already set to a default):
