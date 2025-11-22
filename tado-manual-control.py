@@ -42,10 +42,9 @@ def argparse_args():
         "check_schedule_types", help="Displays the active schedule type")
 
     # set_schedule_type:
-    parse_set_schedule_type = subparsers.add_parser(
-        "set_schedule_type", help="Sets the active schedule type (0 (= ONE_DAY), 1 (= THREE_DAY) or 2 (=SEVEN_DAY))")
+    parse_set_schedule_type = subparsers.add_parser("set_schedule_type")
     parse_set_schedule_type.add_argument(
-        "-s", "--schedule_type", nargs=1, type=int, choices=[0, 1, 2])
+        "-s", "--schedule_type", nargs=1, type=int, choices=[0, 1, 2], help="Sets the active schedule type (0 (= ONE_DAY), 1 (= THREE_DAY) or 2 (= SEVEN_DAY))")
 
     # manualtemp:
     parse_manualtemp = subparsers.add_parser(
@@ -124,16 +123,22 @@ def _output_to_sheets(zone_id, zone_name, outputforsheets):
     save_data(filepath, data)
 
 
-def _check_temperature(temp_to_check, column, sheet, file):
+def _error_message_time(time_to_check, column, row, sheet, file):
+    error_message = 'The time "' + str(time_to_check) + '" in column ' + str(column) + ' on row ' + str(row) + ' of sheet "' + str(sheet) + '" in file "' + str(
+        file) + '" isn\'t valid. Make sure to enter a time, or a string formatted "%H:%M" (see https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes).'
+    return error_message
+
+
+def _check_temperature(temp_to_check, column, row, sheet, file):
     if (not isinstance(temp_to_check, int)) and (not isinstance(temp_to_check, float)):
-        error_message = 'The temperature "' + str(temp_to_check) + '" in column ' + str(column) + ' of sheet ' + \
-            str(sheet) + 'in file ' + str(file) + ' isn\'t valid. Make sure to enter a number, using the proper decimal separator.'
-        raise ValueError(error_message)
+        error_message_temp = 'The temperature "' + str(temp_to_check) + '" in column ' + str(column) + ' on row ' + str(row) + ' of sheet ' + \
+            str(sheet) + ' in file ' + str(file) + ' isn\'t valid. Make sure to enter a number, using the proper decimal separator.'
+        raise ValueError(error_message_temp)
     else:
         return temp_to_check
 
 
-def _check_times(time_to_check, column, sheet, file):
+def _check_times(time_to_check, column, row, sheet, file):
     if isinstance(time_to_check, time):
         time_to_check = time_to_check.strftime("%H:%M")
     elif isinstance(time_to_check, str):
@@ -142,16 +147,15 @@ def _check_times(time_to_check, column, sheet, file):
             bool(datetime.strptime(time_to_check, format))
         except ValueError:
             format = "%H:%M:%S"
-            if datetime.strptime(time_to_check, format):
-                time_to_check = time_to_check[:-3]
-            else:
-                error_message = 'The time "' + str(time_to_check) + '" in column ' + str(column) + ' of sheet ' + str(sheet) + 'in file ' + str(
-                    file) + ' isn\'t valid. Make sure to enter a time, or a string formatted "%H:%M" (see https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes).'
-                raise ValueError(error_message)
+            try:
+                if datetime.strptime(time_to_check, format):
+                    time_to_check = time_to_check[:-3]
+                else:
+                    raise ValueError(_error_message_time(time_to_check, column, row, sheet, file))
+            except ValueError:
+                raise ValueError(_error_message_time(time_to_check, column, row, sheet, file))
     else:
-        error_message = 'The time "' + str(time_to_check) + '" in column ' + str(column) + ' of sheet ' + str(sheet) + 'in file ' + str(
-            file) + ' isn\'t valid. Make sure to enter a time, or a string formatted "%H:%M" (see https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes).'
-        raise ValueError(error_message)
+        raise ValueError(_error_message_time(time_to_check, column, row, sheet, file))
     return time_to_check
 
 
@@ -170,13 +174,21 @@ def upload_schedule_blocks_from_ods():
             for key, value in sheets_from_ods_file.items():
                 schedule = int(key[0])
                 dayType = key[-(len(key)-2):]
+                row = 0
                 for entry in value:
-                    start = _check_times(entry[0], "A", key, filename)
-                    end = _check_times(entry[1], "B", key, filename)
-                    temperature = _check_temperature(entry[2], "C", key, filename)
-                    new_schedule_block = _new_schedule_block(
-                        dayType, start, end, temperature)
-                    schedule_blocks_to_set[schedule].append(new_schedule_block)
+                    row = row + 1
+                    if len(entry) == 3:
+                        start = _check_times(entry[0], "A", row, key, filename)
+                        end = _check_times(entry[1], "B", row, key, filename)
+                        temperature = _check_temperature(entry[2], "C", row, key, filename)
+                        new_schedule_block = _new_schedule_block(
+                            dayType, start, end, temperature)
+                        schedule_blocks_to_set[schedule].append(new_schedule_block)
+                    elif len(entry) != 0:
+                        error_message = "Row " + str(row) + "isn't formatted correctly"
+                        raise ValueError(error_message)
+                    else:
+                        continue
 
             for schedule_int, schedule_block in enumerate(schedule_blocks_to_set):
                 t.set_schedule_blocks(zone_int, schedule_int, schedule_block)

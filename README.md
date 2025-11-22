@@ -60,7 +60,7 @@ I started working on this before tado came up with its idiotic idea to limit API
 ## Acknowledgements
 Guided by an article I found online (https://samharrison.science/posts/tado-heating-python-api/), I found two python libraries which used the unofficial tado API (https://kritsel.github.io/tado-openapispec-v2/swagger):
 * python-tado (https://pypi.org/project/python-tado/) - I ran into an issue, which I couldn't resolve quickly. The problem was probably on my end, but I moved on...
-* libtado (https://libtado.readthedocs.io/en/latest/) - This is the library I ended up using, although I did need to fix something (see above).
+* libtado (https://libtado.readthedocs.io/en/latest/) - This is the library I ended up using, although I did need to fix something (see above). At the time of my latest commit (22/11/2025), the most recent version of `libtado` was `4.1.1`.
 
 I'm sure both libraries have value, and both deserve being honored.
 
