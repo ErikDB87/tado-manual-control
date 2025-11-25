@@ -243,6 +243,20 @@ def reactivate_schedule(zone):
     t.end_manual_control(zone)
 
 
+def get_rate_limit():
+    # request the rate limit info.
+    rate_limit_info = t.get_rate_limit_info()
+
+    # use it in this way:
+    # total granted calls in each ratelimit window (e.g. 20.000 for auto-assist, or eventually 100 if not subscribed)
+    print('total calls:', rate_limit_info.granted_calls)
+    print('remaining calls:', rate_limit_info.remaining_calls)  # remaining calls within the current ratelimit window
+    # duration in seconds of the ratelimit window (always 86.400, 1 day)
+    print('rate limit window (in seconds):', rate_limit_info.granted_calls_period_in_seconds)
+    # UTC timestamp at which the ratelimit window resets (in my observation, mostly not provided and thus None)
+    print('rate limit resets at (UTC):', rate_limit_info.ratelimit_resets_at_utc)
+
+
 if __name__ == "__main__":
     args = argparse_args()
     tadologin()
@@ -250,18 +264,22 @@ if __name__ == "__main__":
     if args.subcommands == "download_schedules":
         print("Downloading your tado schedules to spreadsheets...")
         download_schedule_blocks_to_ods()
+
     elif args.subcommands == "upload_schedules":
         print("Uploading your tado schedules from spreadsheets...")
         upload_schedule_blocks_from_ods()
+
     elif args.subcommands == "check_schedule_types":
         print("Getting the schedule type for all your zones...")
         get_schedule_types()
+
     elif args.subcommands == "set_schedule_type":
         schedule_type = args.schedule_type[0]
         text = "Setting schedule type " + \
             str(schedule_type)+" for all your zones..."
         print(text)
         set_schedule_types(args.schedule_type[0])
+
     elif args.subcommands == "manualtemp":
         zone = args.zone[0]
         temp = args.temperature[0]
@@ -272,8 +290,11 @@ if __name__ == "__main__":
             temp = (temp - 32) * 5/9
         print(text)
         set_zone_to_temp(zone, temp)
+
     elif args.subcommands == "back_to_schedule":
         zone = args.zone[0]
         text = "Reactivating the schedule for zone "+str(zone)+"..."
         print(text)
         reactivate_schedule(zone)
+
+    get_rate_limit()
