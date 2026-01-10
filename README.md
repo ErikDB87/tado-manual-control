@@ -29,6 +29,9 @@ Because the openHAB tado binding became unusable due to tado's API call limit, I
 ### Reactivate schedule mode for a specific zone
 Logically, I also added a way to reactivate the schedule for a specific zone.
 
+### Get rate limit info
+You can get the rate limit info.
+
 ## Requirements
 Obviously, the file `requirements.txt` contains requirements.
 
@@ -56,6 +59,7 @@ I started working on this before tado came up with its idiotic idea to limit API
 * `set_schedule_type`: 1 call to get all your zones, then 1 call per zone
 * `manualtemp`: 1 call
 * `back_to_schedule`: 1 call
+* `get_rate_limit_info`: 0 calls, unless it's the first thing you do, then 1 call.
 
 ## Acknowledgements
 Guided by an article I found online (https://samharrison.science/posts/tado-heating-python-api/), I found two python libraries which used the unofficial tado API (https://kritsel.github.io/tado-openapispec-v2/swagger):

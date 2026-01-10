@@ -57,6 +57,10 @@ def argparse_args():
         "back_to_schedule", help="Reactivates the schedule for a defined zone")
     parse_back_to_schedule.add_argument("-z", "--zone", nargs=1, type=int)
 
+    # get_rate_limit_info:
+    subparsers.add_parser(
+        "get_rate_limit_info", help="Displays the API rate limit info")
+
     args = parser.parse_args()
     return args
 
@@ -243,7 +247,7 @@ def reactivate_schedule(zone):
     t.end_manual_control(zone)
 
 
-def get_rate_limit():
+def get_rate_limit_info():
     # request the rate limit info.
     rate_limit_info = t.get_rate_limit_info()
 
@@ -297,4 +301,5 @@ if __name__ == "__main__":
         print(text)
         reactivate_schedule(zone)
 
-    get_rate_limit()
+    elif args.subcommands == "get_rate_limit_info":
+        get_rate_limit_info()
