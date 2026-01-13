@@ -10,6 +10,9 @@ Within each sheet the setup is very basic: in column A is the begin hour of the 
 
 While I was working on this script, tado announced it would limit API calls to 100 per day. Out of necessity, I decided to add limited TVR control.
 
+## Parameters
+(For now, this README lacks information about required parameters. Use `--help` to figure them out.)
+
 ## Features
 ### Download schedules
 The script can download all schedules to above mentioned `ods` files.
@@ -32,14 +35,22 @@ Logically, I also added a way to reactivate the schedule for a specific zone.
 ### Get rate limit info
 You can get the rate limit info.
 
+### Get `home_state`
+You can check whether your tado system thinks you're home or not.
+
+### Set `home_state`
+You can set whether you're home or not.
+
 ## Requirements
 Obviously, the file `requirements.txt` contains requirements.
 
-I altered `/libtado/api.py` to take advantage of a workaround for tado's API limit ( https://github.com/s1adem4n/tado-api-proxy). I amended line 125, and added a line 126:
+I altered `/libtado/api.py` to take advantage of a workaround for tado's API limit (https://github.com/s1adem4n/tado-api-proxy). I amended line 125, and added a line 126:
 ```
 # api = 'https://my.tado.com/api/v2'             ## This was the original URL
-api = 'http://192.168.1.10:52069/api/v2'         ## This works, thanks to https://github.com/s1adem4n/tado-api-proxy
+api = 'http://192.168.1.10:52069/api/v2'         ## This works, thanks to https://github.com/s1adem4n/tado-api-proxy - but be careful: https://github.com/s1adem4n/tado-api-proxy/issues/11
 ```
+
+Furthermore, I added a makeshift solution for when a `429` response is received. I expect `libtado` to implement a better solution somewhere in the future. To use my temporary solution, copy `api.py`.
 
 ## Settings
 The script doesn't require much personalization, except for three variables (which are already set to a default):
@@ -59,7 +70,9 @@ I started working on this before tado came up with its idiotic idea to limit API
 * `set_schedule_type`: 1 call to get all your zones, then 1 call per zone
 * `manualtemp`: 1 call
 * `back_to_schedule`: 1 call
-* `get_rate_limit_info`: 0 calls, unless it's the first thing you do, then 1 call.
+* `get_rate_limit_info`: 1 call (although I don't really understand why...)
+* `get_home_state`: 1 call
+* `set_home_state`: 1 call
 
 ## Acknowledgements
 Guided by an article I found online (https://samharrison.science/posts/tado-heating-python-api/), I found two python libraries which used the unofficial tado API (https://kritsel.github.io/tado-openapispec-v2/swagger):

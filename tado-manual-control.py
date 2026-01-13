@@ -60,6 +60,15 @@ def argparse_args():
     # get_rate_limit_info:
     subparsers.add_parser(
         "get_rate_limit_info", help="Displays the API rate limit info")
+    
+    # get_home_state:
+    subparsers.add_parser(
+        "get_home_state", help="Displays the home state")
+    
+    # set_home_state:
+    parse_set_home_state = subparsers.add_parser(
+        "set_home_state", help="Sets the home state")
+    parse_set_home_state.add_argument("-s", "--state", nargs=1, type=bool)
 
     args = parser.parse_args()
     return args
@@ -247,6 +256,14 @@ def reactivate_schedule(zone):
     t.end_manual_control(zone)
 
 
+def get_home_state():
+    print(t.get_home_state())
+
+    
+def set_home_state(state):
+    print(t.set_home_state(state))
+
+
 def get_rate_limit_info():
     # request the rate limit info.
     rate_limit_info = t.get_rate_limit_info()
@@ -301,5 +318,14 @@ if __name__ == "__main__":
         print(text)
         reactivate_schedule(zone)
 
+    elif args.subcommands == "get_home_state":
+        get_home_state()
+        
+    elif args.subcommands == "set_home_state":
+        state = args.state[0]
+        print(state)
+        print(type(state))
+        set_home_state(state)
+        
     elif args.subcommands == "get_rate_limit_info":
         get_rate_limit_info()
