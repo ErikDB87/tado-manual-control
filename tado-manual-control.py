@@ -65,10 +65,14 @@ def argparse_args():
     subparsers.add_parser(
         "get_home_state", help="Displays the home state")
     
+    # remove_home_state:
+    subparsers.add_parser(
+        "remove_home_state", help="Removes the manually set home state")
+    
     # set_home_state:
     parse_set_home_state = subparsers.add_parser(
         "set_home_state", help="Sets the home state")
-    parse_set_home_state.add_argument("-s", "--state", nargs=1, type=bool)
+    parse_set_home_state.add_argument("-s", "--state", nargs=1, choices=['True', 'False'])
 
     args = parser.parse_args()
     return args
@@ -258,6 +262,10 @@ def reactivate_schedule(zone):
 
 def get_home_state():
     print(t.get_home_state())
+    
+    
+def remove_home_state():
+    print(t.remove_home_state())
 
     
 def set_home_state(state):
@@ -321,8 +329,11 @@ if __name__ == "__main__":
     elif args.subcommands == "get_home_state":
         get_home_state()
         
+    elif args.subcommands == "remove_home_state":
+        remove_home_state()
+        
     elif args.subcommands == "set_home_state":
-        state = args.state[0]
+        state = eval(args.state[0])
         print(state)
         print(type(state))
         set_home_state(state)
